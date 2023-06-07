@@ -1,8 +1,8 @@
-defmodule OracalcTest do
+defmodule RatcalcTest do
   use ExUnit.Case
-  doctest Oracalc
+  doctest Ratcalc
 
   test "greets the world" do
-    assert Oracalc.hello() == :world
+    assert Ratcalc.hello() == :world
   end
 end

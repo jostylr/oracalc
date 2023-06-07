@@ -1,9 +1,9 @@
-defmodule Oracalc.MixProject do
+defmodule Ratcalc.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :oracalc,
+      app: :ratcalc,
       version: "0.1.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,

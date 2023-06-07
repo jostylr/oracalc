@@ -1,6 +1,6 @@
-defmodule Oracalc do
+defmodule Ratcalc do
   @moduledoc """
-  Documentation for `Oracalc`.
+  Documentation for `Ratcalc`.
   """
 
   @doc """
@@ -8,7 +8,7 @@ defmodule Oracalc do
 
   ## Examples
 
-      iex> Oracalc.frac()
+      iex> Ratcalc.frac()
       :world
 
   """
@@ -25,6 +25,6 @@ defmodule Oracalc do
   end
 end
 
-Oracalc.frac(22, 7)
-|> Oracalc.fracString()
+Ratcalc.frac(22, 7)
+|> Ratcalc.fracString()
 |> IO.puts()
