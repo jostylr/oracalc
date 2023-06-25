@@ -2,7 +2,7 @@ defmodule RatcalcTest do
   use ExUnit.Case
   doctest Ratcalc
 
-  test "greets the world" do
-    assert Ratcalc.hello() == :world
+  test "makes a fraction" do
+    assert Ratcalc.frac(7, 22) == {7, 22}
   end
 end
