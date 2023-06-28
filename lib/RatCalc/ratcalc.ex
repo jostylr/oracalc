@@ -1,5 +1,7 @@
 defmodule Ratcalc do
   @undef {0, 0}
+  @zero {0, 1}
+
   @moduledoc """
   `Ratcalc` is a module that deals with fractional arithmetic. Its main purpose is to support Intercalc which does interval calculations with fractions.
   It can do the usual operations as well as compute averages, mediants, and reports a decimal version.
@@ -85,38 +87,39 @@ defmodule Ratcalc do
     |> mul(p)
   end
 
+  @spec reduce(frac, integer) :: frac()
+  @doc """
+  A fraction can be reduced with a non-zero integer. The integer should divide into both numerator and denominator. Errors will result otherwise. By the way the newf works, having the integer be negative will not alter anything. If the integer is 0, we get undef
+  """
+  def reduce(_, 0), do: @undef
+  def reduce({num, den}, fact), do: newf(div(num, fact), div(den, fact))
+
   @spec reduce(frac) :: frac
   @doc """
   Reduce a fraction if common factors
   """
-  def reduce({num, den}) do
-    gcd = Integer.gcd(num, den)
-    (gcd === 0 && @undef) || newf(div(num, gcd), div(den, gcd))
-  end
+  def reduce(frac = {num, den}), do: reduce(frac, Integer.gcd(num, den))
 
   @spec scale(frac, integer) :: frac
   @doc """
   Scales a fraction's numerator and denominator by integer
   """
-  def scale({num, den}, j) do
-    newf(num * j, den * j)
-  end
+  def scale({num, den}, j), do: newf(num * j, den * j)
 
   @spec common(frac, frac) :: {frac, frac}
   @doc """
   Returns a tuple
   """
-  def common({pn, pm}, {qn, qm}) do
-    cd = Integer.gcd(pm, qm)
+  def common(p = {_, pm}, q = {_, qm}), do: common(p, q, Integer.gcd(pm, qm))
 
-    if cd === 0 do
-      {newf(pn, pm), newf(qn, qm)}
-    else
-      qcd = div(qm, cd)
-      pcd = div(pm, cd)
-      den = qcd * pm
-      {newf(qcd * pn, den), newf(pcd * qn, den)}
-    end
+  @spec common(frac, frac, integer) :: {frac, frac}
+  defp common(p, q, 0), do: {p, q}
+
+  defp common({pn, pm}, {qn, qm}, fact) do
+    qfact = div(qm, fact)
+    pfact = div(pm, fact)
+    den = qfact * pm
+    {newf(qfact * pn, den), newf(pfact * qn, den)}
   end
 
   @spec average(frac, frac) :: frac
@@ -133,8 +136,7 @@ defmodule Ratcalc do
   Averages a list of fractions
   """
   def average(fracs) do
-    {sum, n} =
-      Enum.reduce(fracs, {newf(0, 1), 0}, fn frac, {acc, n} -> {add(frac, acc), n + 1} end)
+    {sum, n} = Enum.reduce(fracs, {@zero, 0}, fn frac, {acc, n} -> {add(frac, acc), n + 1} end)
 
     mul(sum, newf(1, n))
   end
