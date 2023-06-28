@@ -1,0 +1,125 @@
+# RatMath
+
+```elixir
+my_app_root = Path.join(__DIR__, "..")
+
+Mix.install(
+  [
+    {:ratcalc, path: my_app_root, env: :prod}
+  ],
+  lockfile: Path.join(my_app_root, "mix.lock")
+)
+```
+
+## Examples
+
+```elixir
+alias RationalCalculator.Fraction, as: Frac
+
+Frac.new(2, 3)
+|> Frac.print(:tex)
+```
+
+## Addition
+
+We will now generate tests for the different functions. We start with addition.
+
+```elixir
+tp = %{
+  a: [2, 3],
+  aa: [-5, 3],
+  b: [4, 6],
+  bb: [-4, 6],
+  cc: [-8, 6],
+  c: [1, 0],
+  d: [-4, 0],
+  e: [0, 0],
+  f: [43, 18],
+  g: [-123, 120],
+  h: [5, -23],
+  j: [-8, -12]
+}
+
+funstr = "add/2"
+
+IO.puts("test \"#{funstr}\" do")
+
+to_make = [
+  [:a, :b],
+  [:b, :bb],
+  [:b, :cc],
+  [:bb, :cc],
+  [:b, :c],
+  [:c, :d],
+  [:a, :d],
+  [:a, :e],
+  [:e, :e],
+  [:f, :g],
+  [:g, :h],
+  [:h, :j]
+]
+
+Enum.each(to_make, fn el ->
+  [l, r] = el
+  [ln, ld] = tp[l]
+  [rn, rd] = tp[r]
+  left = Frac.new(ln, ld)
+  right = Frac.new(rn, rd)
+  res = Frac.add(left, right)
+  nxt = "assert add( new(#{ln}, #{ld}), new(#{rn}, #{rd}) ) === new(#{res.num}, #{res.den})"
+  IO.puts(nxt)
+end)
+
+IO.puts("end")
+```
+
+## Multiplication
+
+```elixir
+tp = %{
+  a: [2, 3],
+  aa: [-5, 3],
+  b: [4, 6],
+  bb: [6, 4],
+  cc: [-8, 6],
+  c: [1, 0],
+  d: [-4, 0],
+  e: [0, 0],
+  f: [43, 18],
+  g: [-123, 120],
+  h: [5, -23],
+  j: [-8, -12]
+}
+
+funstr = "mul/2"
+
+IO.puts("test \"#{funstr}\" do")
+
+to_make = [
+  [:a, :b],
+  [:b, :bb],
+  [:b, :cc],
+  [:bb, :cc],
+  [:b, :c],
+  [:c, :d],
+  [:a, :d],
+  [:a, :e],
+  [:e, :e],
+  [:f, :g],
+  [:g, :h],
+  [:h, :j]
+]
+
+Enum.each(to_make, fn el ->
+  [l, r] = el
+  [ln, ld] = tp[l]
+  [rn, rd] = tp[r]
+  left = Frac.new(ln, ld)
+  right = Frac.new(rn, rd)
+  res = Frac.mul(left, right)
+  nxt = "assert mul( new(#{ln}, #{ld}), new(#{rn}, #{rd}) ) === new(#{res.num}, #{res.den})"
+  IO.puts(nxt)
+end)
+
+IO.puts("end")
+```
