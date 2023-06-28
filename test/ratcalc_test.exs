@@ -44,6 +44,14 @@ defmodule RatcalcTest do
     assert(nz === newf(-3, 0))
   end
 
+  test "undef" do
+    p = newf(2, 0)
+    q = newf(-5, 0)
+    assert add(p, q) === {0, 0}
+    assert mul(p, q) === {-10, 0}
+    assert flip(p) === {0, 2}
+  end
+
   test "average" do
     p = newf(5, 6)
     q = newf(7, 9)

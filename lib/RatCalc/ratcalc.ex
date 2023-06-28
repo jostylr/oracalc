@@ -14,13 +14,8 @@ defmodule Ratcalc do
   @doc """
   Frac creates a 2-tuple for a frac. It makes sure all denominators are non-negative. Zero is okay!
   """
-  def newf(num, den) do
-    if den < 0 do
-      {-num, -den}
-    else
-      {num, den}
-    end
-  end
+  def newf(num, den) when den < 0, do: {-num, -den}
+  def newf(num, den), do: {num, den}
 
   @spec print(frac, :tex) :: String.t()
   @doc """
@@ -42,13 +37,9 @@ defmodule Ratcalc do
   @doc """
   adds two fractions together
   """
-  def add({pn, pm}, {qn, qm}) do
-    if pm == qm do
-      newf(pn + qn, pm)
-    else
-      newf(pn * qm + qn * pm, pm * qm)
-    end
-  end
+  def add({pn, pm}, {qn, qm}) when pm == 0 and qm == 0 and pn * qn <= 0, do: @undef
+  def add({pn, pm}, {qn, qm}) when pm == qm, do: newf(pn + qn, pm)
+  def add({pn, pm}, {qn, qm}), do: newf(pn * qm + qn * pm, pm * qm)
 
   @spec mul(frac, frac) :: frac
   @doc """
