@@ -26,3 +26,5 @@ ratcalc-*.tar
 /tmp/
 
 .vscode
+
+.DS_Store
