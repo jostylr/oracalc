@@ -817,4 +817,36 @@ defmodule RationalCalculator.Fraction do
       fn -> Decimal.div(p.num, p.den) end
     )
   end
+
+  @doc """
+  Returns distance between two fractions as 4 place decimal rounded up.
+
+  ## Examples
+
+      iex> distance(new(1, 2), new(1, 3))
+      Decimal.new("0.1667")
+
+      iex>distance(new(5,6), new(5,6))
+      Decimal.new("0")
+
+      iex>distance(new(1,0), new(-1,0))
+      Decimal.new("+Infinity")
+
+  """
+  @spec distance(t, t) :: Decimal.t()
+  def distance(p = %Frac{}, q = %Frac{}) when q.den == 0 or p.den == 0,
+    do: Decimal.new("+Infinity")
+
+  def distance(p, q) do
+    d = sub(p, q)
+
+    d =
+      if d.num < 0 do
+        %{d | num: -d.num}
+      else
+        d
+      end
+
+    deci(d, :ceiling, 4)
+  end
 end
