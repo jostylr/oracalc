@@ -222,7 +222,7 @@ defmodule RationalCalculator.Fraction do
   @doc """
   Subtracts two fractions.
 
-   ## Examples
+  ## Examples
 
       iex> sub(new(2, 3), new(4, 5))
       new(-2, 15)
@@ -286,6 +286,20 @@ defmodule RationalCalculator.Fraction do
   end
 
   @doc """
+  This finds the greatest common factor between numerator and denominator
+
+  ## Examples
+
+      iex> gcf(new(12, 8))
+      4
+
+  """
+  @spec gcf(t) :: integer
+  def gcf(p) do
+    Integer.gcd(p.num, p.den)
+  end
+
+  @doc """
   A fraction can be reduced with a non-zero integer.
 
   The integer should divide into both numerator and denominator. Incorrect results will happen.
@@ -333,7 +347,20 @@ defmodule RationalCalculator.Fraction do
   def reduce(p = %Frac{}), do: reduce(p, Integer.gcd(p.num, p.den))
 
   @doc """
-  Scales a fraction's numerator and denominator by integer
+  Scales a fraction's numerator and denominator by an integer.
+
+  Idempotent on normalized (0 and infinities)
+
+  A negative scaling works but is not different than a positve scaling with the same magnitude
+
+  ## Examples
+
+      iex> scale(new(5,3), 2)
+      new(10,6)
+
+      iex> scale(new(4, 8), -3)
+      new(12, 24)
+
   """
   @spec scale(t, integer) :: t
   def scale(p = %Frac{}, scalar), do: new(p.num * scalar, p.den * scalar)
@@ -402,8 +429,18 @@ defmodule RationalCalculator.Fraction do
       iex> gt?(new(3, 4), new(1, 3))
       true
 
+      iex> gt?(new(-5,3), new(4,5))
+      false
+
+      iex> gt?(new(6,6), new(3,3))
+      false
+
+      iex> gt?(new(1, 0), new(100,1))
+      true
+
       iex> gt?(new(0,0), new(2,3))
       false
+
   """
   @spec gt?(t, t) :: boolean
   def gt?(p = %Frac{}, q = %Frac{}) do
@@ -417,11 +454,194 @@ defmodule RationalCalculator.Fraction do
   end
 
   @doc """
-  Returns a tuple
+  Returns true if the first fraction is greater than or equal to the second
+
+  Indeterminants return false.
+
+  ## Examples
+
+      iex> gte?(new(3, 4), new(1, 3))
+      true
+
+      iex> gte?(new(-5,3), new(4,5))
+      false
+
+      iex> gte?(new(6,6), new(3,3))
+      true
+
+      iex> gte?(new(1, 0), new(100,1))
+      true
+
+      iex> gte?(new(0,0), new(2,3))
+      false
+  """
+  @spec gte?(t, t) :: boolean
+  def gte?(p = %Frac{}, q = %Frac{}) do
+    res = cmp(p, q)
+
+    if res == :gt or res === :eq do
+      true
+    else
+      false
+    end
+  end
+
+  @doc """
+  Returns true if the first fraction is less than the second
+
+  Indeterminants return false.
+
+  ## Examples
+
+      iex> lt?(new(3, 4), new(1, 3))
+      false
+
+      iex> lt?(new(-5,3), new(4,5))
+      true
+
+      iex> lt?(new(6,6), new(3,3))
+      false
+
+      iex> lt?(new(1, 0), new(100,1))
+      false
+
+      iex> lt?(new(0,0), new(2,3))
+      false
+
+
+  """
+  @spec lt?(t, t) :: boolean
+  def lt?(p = %Frac{}, q = %Frac{}) do
+    res = cmp(p, q)
+
+    if res == :lt do
+      true
+    else
+      false
+    end
+  end
+
+  @doc """
+  Returns true if the first fraction is less than or equal to the second
+
+  Indeterminants return false.
+
+  ## Examples
+
+      iex> lte?(new(3, 4), new(1, 3))
+      false
+
+      iex> lte?(new(-5,3), new(4,5))
+      true
+
+      iex> lte?(new(6,6), new(3,3))
+      true
+
+      iex> lte?(new(1, 0), new(100,1))
+      false
+
+      iex> lte?(new(0,0), new(2,3))
+      false
+
+
+  """
+  @spec lte?(t, t) :: boolean
+  def lte?(p = %Frac{}, q = %Frac{}) do
+    res = cmp(p, q)
+
+    if res == :lt or res == :eq do
+      true
+    else
+      false
+    end
+  end
+
+  @doc """
+  Returns true if the first fraction is equal to the second
+
+  Indeterminants return false.
+
+  ## Examples
+
+      iex> eq?(new(3, 4), new(1, 3))
+      false
+
+      iex> eq?(new(-5,3), new(4,5))
+      false
+
+      iex> eq?(new(6,6), new(3,3))
+      true
+
+      iex> eq?(new(1, 0), new(1,0))
+      false
+
+      iex> eq?(new(0,0), new(0,0))
+      false
+
+
+  """
+  @spec eq?(t, t) :: boolean
+  def eq?(p = %Frac{}, q = %Frac{}) do
+    res = cmp(p, q)
+
+    if res == :eq do
+      true
+    else
+      false
+    end
+  end
+
+  @doc """
+  Returns true if the comparison cannot be done.
+
+  1/0 vs 1/0  and 0/0 are the main examples
+
+  ## Examples
+
+      iex> unk?(new(3, 4), new(1, 3))
+      false
+
+      iex> unk?(new(-5,0), new(-3,0))
+      true
+
+      iex> unk?(new(1,0), new(-1,0))
+      false
+
+      iex> unk?(new(1, 0), new(1,0))
+      true
+
+      iex> unk?(new(0,0), new(2,3))
+      true
+
+
+  """
+  @spec unk?(t, t) :: boolean
+  def unk?(p = %Frac{}, q = %Frac{}) do
+    res = cmp(p, q)
+
+    if res == :unk do
+      true
+    else
+      false
+    end
+  end
+
+  @doc """
+  Returns scaled versions of the two fractions with the denominators having
+  been converted to a common denominator.
+
+  This uses the given denominators; no reduction is performed.
+
+  ## Examples
+
+      iex> common(new(5, 9), new(4, 6))
+      {new(10, 18), new(12, 18)}
+
   """
   @spec common(t, t) :: {t, t}
   def common(p = %Frac{}, q = %Frac{}), do: common(p, q, Integer.gcd(p.den, q.den))
 
+  # Cannot see a use for this so made it private.
   @spec common(t, t, integer) :: {t, t}
   defp common(p, q, 0), do: {p, q}
 
@@ -433,7 +653,55 @@ defmodule RationalCalculator.Fraction do
   end
 
   @doc """
-  Compute the average of two fractions by adding and dividing by 2
+  Takes an fraction and an integer and raises the fraction to that power.
+
+   ## Examples
+
+    iex> pow(new(10,6), 7 )
+    new(5**7, 3**7)
+
+  """
+  @spec pow(t, integer) :: t
+  def pow(p = %Frac{num: 0, den: 0}, _), do: p
+  # sends a/0 to 0/0 when raised to 0th power. the rest are 1 in a different form
+  def pow(%Frac{den: d}, 0), do: new(d, d)
+  def pow(p, exp) when exp < 0, do: pow(flip(p), -exp)
+
+  def pow(p, exp) do
+    p = reduce(p)
+    new(p.num ** exp, p.den ** exp)
+  end
+
+  @doc """
+  Sums up a list of fractions.
+  Returns in reduced form along with number of summands
+
+  ## Examples
+
+      iex> sum([new(5,3), new(6,12), new(7, 10)])
+      {new(43, 15), 3}
+
+  """
+  @spec sum(list(t)) :: {t, integer}
+  def sum(fracs) do
+    {num, den, n} =
+      Enum.reduce(fracs, {0, 1, 0}, fn p, {num, den, n} ->
+        {p.num * den + num * p.den, p.den * den, n + 1}
+      end)
+
+    {reduce(new(num, den)), n}
+  end
+
+  @doc """
+  Compute the average of two fractions by adding and dividing by 2.
+
+  This is not in reduced form.
+
+  ## Examples
+
+      iex> average(new(4, 3), new(6,4) )
+      new(34, 24)
+
   """
   @spec average(t, t) :: t
   def average(p, q) do
@@ -443,20 +711,61 @@ defmodule RationalCalculator.Fraction do
 
   @spec average(list(t)) :: t
   @doc """
-  Averages a list of fractions
+  Averages a list of fractions.
+
+  ## Examples
+
+      iex> average([new(5,3), new(6,12), new(7, 10)])
+      new(43, 45)
+
   """
   def average(fracs) do
-    {sum, n} =
-      Enum.reduce(fracs, {%Frac{num: 0, den: 1}, 0}, fn frac, {acc, n} ->
-        {add(frac, acc), n + 1}
+    {total, n} = sum(fracs)
+    mul(total, new(1, n))
+  end
+
+  @doc """
+  Multiplies up a list of fractions.
+
+  Returns in reduced form along with number of terms.
+
+  ## Examples
+
+      iex> prod([new(5,3), new(6,12), new(7, 10)])
+      {new(7, 12), 3}
+
+  """
+  @spec prod(list(t)) :: {t, integer}
+  def prod(fracs) do
+    {num, den, n} =
+      Enum.reduce(fracs, {1, 1, 0}, fn p, {num, den, n} ->
+        {p.num * num, p.den * den, n + 1}
       end)
 
-    mul(sum, new(1, n))
+    {reduce(new(num, den)), n}
   end
 
   @doc """
   Mediant adds the numerators and denominators to get a fraction in between.
-  If using this with 0/0, the mediant returns the original which seems reasonable since it has nowhere else to go. For n/0, it adds n to the numerators, so inching towards the infinity in the denominator increments. Kind of nice.
+
+  If using this with 0/0, the mediant returns the original which seems reasonable since it
+  has nowhere else to go. For n/0, it adds n to the numerators, so inching towards the infinity
+  in the denominator increments. Kind of nice.
+
+  ## Examples
+
+      iex> mediant(new(3, 2), new(4, 3))
+      new(7, 5)
+
+      iex> mediant(new(5, 1), new(1,0))
+      new(6,1)
+
+      iex> mediant(new(7, 3), new(0, 0))
+      new(7,3)
+
+      iex> mediant( new(7, 3), new(-7, 3) )
+      new(0, 3)
+
   """
   @spec mediant(t, t) :: t
   def mediant(p = %Frac{}, q = %Frac{}) do
@@ -464,22 +773,45 @@ defmodule RationalCalculator.Fraction do
   end
 
   @doc """
-  This creates a decimal version of the frac up the number of specified decimal places.
+  This creates a decimal version of the fraction.
 
+  The second parameter specifies how it should round. Use
+  :gt to get a decimal greater than the fraciton and :lt to get one less than. One can also
+  use the rounding type from the Decimal package.
 
+  The decimal will go up to the number of specified decimal places, which
+  is the optional third parameter.
 
-  Use :gt in the thrid parameter
-   This is all text as we do not use the decimals for any computation. This makes division by zero easy to handle by being able to give a string representation of infinity
+  Use Decimal.to_string() to get a string version. Passing in :raw as 2nd argument yields
+  a string of digits then E then power of 10 offset, mostly. The E portion may be missing.
+
+  ## Examples
+
+      iex> deci(new(10,3), :gt, 4)
+      Decimal.new("3.334")
+
+      iex> deci(new(10,3), :lt, 4) |> Decimal.to_string(:raw)
+      "3333E-3"
+
+      iex> deci(new(1,0), :gt, 4) |> Decimal.to_string()
+      "Infinity"
+
+      iex> deci(new(-1,0), :gt, 4) |> Decimal.to_string()
+      "-Infinity"
+
+      iex> deci(new(0,0), :gt, 4) |> Decimal.to_string()
+      "NaN"
+
   """
   @spec deci(t, pos_integer(), atom()) :: Decimal.t()
-  def deci(p, places \\ 5, type)
-  def deci(p = %Frac{}, places, :gt), do: deci(p, places, :ceiling)
-  def deci(p = %Frac{}, places, :lt), do: deci(p, places, :floor)
+  def deci(p, type, places \\ 5)
+  def deci(p = %Frac{}, :gt, places), do: deci(p, :ceiling, places)
+  def deci(p = %Frac{}, :lt, places), do: deci(p, :floor, places)
   def deci(%Frac{num: 0, den: 0}, _, _), do: Decimal.new("NaN")
   def deci(%Frac{num: n, den: 0}, _, _) when n > 0, do: Decimal.new("+Infinity")
   def deci(%Frac{num: n, den: 0}, _, _) when n < 0, do: Decimal.new("-Infinity")
 
-  def deci(p = %Frac{}, places, type) do
+  def deci(p = %Frac{}, type, places) do
     Decimal.Context.with(
       %Decimal.Context{precision: places, rounding: type},
       fn -> Decimal.div(p.num, p.den) end

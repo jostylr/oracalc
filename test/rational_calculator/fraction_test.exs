@@ -58,8 +58,8 @@ defmodule RationalCalculator.FractionTest do
     q = new(7, 9)
     r = new(-3, 1)
     assert(average(p, q) === new(87, 108))
-    assert(average([p, q, r]) === add(p, q) |> add(r) |> mul(new(1, 3)))
-    assert(average([p, q, r]) === new(-75, 162))
+    assert(average([p, q, r]) === add(p, q) |> add(r) |> mul(new(1, 3)) |> reduce())
+    assert(average([p, q, r]) === new(-25, 54))
   end
 
   test "mediant" do
@@ -67,10 +67,10 @@ defmodule RationalCalculator.FractionTest do
     q = new(32, -6)
     m = mediant(p, q)
     assert m === mediant(q, p)
-    assert deci(m, 8, :gt) |> Decimal.to_string(:raw) === "7"
+    assert deci(m, :gt, 8) |> Decimal.to_string(:raw) === "7"
     assert mediant(m, q) === new(59, 19)
-    assert deci(mediant(m, q), 8, :gt) |> Decimal.to_string(:raw) === "31052632E-7"
-    assert deci(mediant(m, q), 8, :lt) |> Decimal.to_string(:raw) === "31052631E-7"
+    assert deci(mediant(m, q), :gt, 8) |> Decimal.to_string(:raw) === "31052632E-7"
+    assert deci(mediant(m, q), :lt, 8) |> Decimal.to_string(:raw) === "31052631E-7"
   end
 
   test "add/2" do
