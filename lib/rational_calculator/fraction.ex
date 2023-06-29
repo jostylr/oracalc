@@ -803,7 +803,7 @@ defmodule RationalCalculator.Fraction do
       "NaN"
 
   """
-  @spec deci(t, pos_integer(), atom()) :: Decimal.t()
+  @spec deci(t, atom(), pos_integer()) :: Decimal.t()
   def deci(p, type, places \\ 5)
   def deci(p = %Frac{}, :gt, places), do: deci(p, :ceiling, places)
   def deci(p = %Frac{}, :lt, places), do: deci(p, :floor, places)
