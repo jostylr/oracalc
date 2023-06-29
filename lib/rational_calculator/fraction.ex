@@ -24,29 +24,29 @@ defmodule RationalCalculator.Fraction do
 
   ## Examples
 
-  iex> new(2, 3)
-  %RationalCalculator.Fraction{num: 2, den: 3}
+      iex> new(2, 3)
+      %RationalCalculator.Fraction{num: 2, den: 3}
 
   Fractions are not reduced
 
-  iex> new(27, 9)
-  %RationalCalculator.Fraction{num: 27, den: 9}
+      iex> new(27, 9)
+      %RationalCalculator.Fraction{num: 27, den: 9}
 
   Zero is normalized to a denominator of 1
 
-  iex> new(0, 7)
-  %RationalCalculator.Fraction{num: 0, den: 1}
+      iex> new(0, 7)
+      %RationalCalculator.Fraction{num: 0, den: 1}
 
-  Denominator of 0 is allowed and is normalized.
+      Denominator of 0 is allowed and is normalized.
 
-  iex> new(23, 0)
-  %RationalCalculator.Fraction{num: 1, den: 0}
+      iex> new(23, 0)
+      %RationalCalculator.Fraction{num: 1, den: 0}
 
-  iex> new(-12, 0)
-  %RationalCalculator.Fraction{num: -1, den: 0}
+      iex> new(-12, 0)
+      %RationalCalculator.Fraction{num: -1, den: 0}
 
-  iex> new(0, 0)
-  %RationalCalculator.Fraction{num: 0, den: 0}
+      iex> new(0, 0)
+      %RationalCalculator.Fraction{num: 0, den: 0}
 
 
 
@@ -64,11 +64,11 @@ defmodule RationalCalculator.Fraction do
 
   ## Examples
 
-  iex> print(new(2, 3), :tex)
-  "\\frac{2}{3}"
+      iex> print(new(2, 3), :tex)
+      "\\frac{2}{3}"
 
-  iex> print(new(12, -32), :tex)
-  "\\frac{-12}{32}"
+      iex> print(new(12, -32), :tex)
+      "\\frac{-12}{32}"
 
 
   """
@@ -80,11 +80,13 @@ defmodule RationalCalculator.Fraction do
   @doc """
   This converts a fraction tuple to a fraction string.
 
-  iex> print(new(2,3))
-  "2/3"
+  ## Examples
 
-  iex> print(new(12, -32))
-  "-12/32"
+      iex> print(new(2,3))
+      "2/3"
+
+      iex> print(new(12, -32))
+      "-12/32"
 
   """
   @spec print(t) :: String.t()
@@ -101,17 +103,23 @@ defmodule RationalCalculator.Fraction do
 
   ## Examples
 
-    iex> add(new(2, 3), new(4, 5))
-    new(22, 15)
+        iex> add(new(2, 3), new(4, 5))
+        new(22, 15)
 
-    iex> add(new(-3, 7), new(10, 7))
-    new(7, 7)
+        iex> add(new(-3, 7), new(10, 7))
+        new(7, 7)
 
-    iex> add(new(5, 0), new(7, 3))
-    new(1, 0)
+        iex> add(new(40, 3), new(-40, 3))
+        new(0, 1)
 
-    iex> add(new(5, 0), new(-7, 0))
-    new(0,0)
+        iex> add(new(5, 0), new(7, 3))
+        new(1, 0)
+
+        iex> add(new(5, 0), new(8, 0))
+        new(1, 0)
+
+        iex> add(new(5, 0), new(-7, 0))
+        new(0,0)
 
   """
   @spec add(t, t) :: t
@@ -125,12 +133,28 @@ defmodule RationalCalculator.Fraction do
 
   Zeros in the denominators continue along, though signs can change.
 
-  iex> mul(new(2, 3), new(4, 5))
-  new(8, 15)
+  ## Examples
 
-  iex>
+      iex> mul(new(2, 3), new(4, 5))
+      new(8, 15)
 
+      iex> mul(new(-3, 7), new(10, 7))
+      new(-30, 49)
 
+      iex> mul(new(-3, 7), new(-7, 3))
+      new(21, 21)
+
+      iex> mul(new(5, 0), new(7, 3))
+      new(1, 0)
+
+      iex> mul(new(5, 0), new(-7, 3))
+      new(-1, 0)
+
+      iex> mul(new(5, 0), new(-7, 0))
+      new(-1,0)
+
+      iex> mul(new(5, 0), new(-7, 0))
+      new(-1,0)
   """
   @spec mul(t, t) :: t
   def mul(p = %Frac{}, q = %Frac{}) do
@@ -139,6 +163,24 @@ defmodule RationalCalculator.Fraction do
 
   @doc """
   Negates a fraction
+
+  ## Examples
+
+      iex> neg(new(3, 4))
+      new(-3, 4)
+
+      iex> neg(new(-3, 4))
+      new(3, 4)
+
+      iex> neg(new(1, 0))
+      new(-1, 0)
+
+      iex> neg(new(0, 1))
+      new(0, 1)
+
+      iex> neg(new(0,0))
+      new(0,0)
+
   """
   @spec neg(t) :: t
   def neg(p = %Frac{}) do
@@ -147,14 +189,61 @@ defmodule RationalCalculator.Fraction do
 
   @spec flip(t) :: t
   @doc """
-  Reciprocates a fraction. Again we don't care about zeros so super easy.
+  Reciprocates a fraction.
+
+  1/0 amd -1/0 map to 0.
+
+  0/1 maps to 0/0 as we have lost sign info.
+
+  ## Examples
+
+      iex> flip(new(3,4))
+      new(4,3)
+
+      iex> flip(new(-23, 10))
+      new(-10, 23)
+
+      iex> flip(new(0, 1))
+      new(0,0)
+
+      iex> flip(new(1, 0))
+      new(0,1)
+
+      iex> flip(new(-1, 0))
+      new(0, 1)
+
   """
+  def flip(%Frac{num: 0}), do: new(0, 0)
+
   def flip(p = %Frac{}) do
     new(p.den, p.num)
   end
 
   @doc """
-  Subtracts two fractions
+  Subtracts two fractions.
+
+   ## Examples
+
+      iex> sub(new(2, 3), new(4, 5))
+      new(-2, 15)
+
+      iex> sub(new(-3, 7), new(10, 7))
+      new(-13, 7)
+
+      iex> sub(new(40, 3), new(-40, 3))
+      new(80, 3)
+
+      iex> sub(new(40, 3), new(40, 3))
+      new(0, 1)
+
+      iex> sub(new(5, 0), new(7, 3))
+      new(1, 0)
+
+      iex> sub(new(5, 0), new(-7, 0))
+      new(1,0)
+
+      iex> sub(new(5, 0), new(7, 0))
+      new(0,0)
   """
   @spec sub(t, t) :: t
   def sub(p = %Frac{}, q = %Frac{}) do
@@ -164,7 +253,30 @@ defmodule RationalCalculator.Fraction do
   end
 
   @doc """
-  Divides two fractions
+  Divides two fractions.
+
+  ## Examples
+
+      iex> divf(new(2, 3), new(4, 5))
+      new(10, 12)
+
+      iex> divf(new(-3, 7), new(10, 7))
+      new(-21, 70)
+
+      iex> divf(new(-3, 7), new(-3, 7))
+      new(21, 21)
+
+      iex> divf(new(-3, 7), new(-7, 3))
+      new(9, 49)
+
+      iex> divf(new(5, 0), new(7, 3))
+      new(1, 0)
+
+      iex> divf(new(-7, 3), new(5, 0))
+      new(0, 1)
+
+      iex> divf(new(5, 0), new(-7, 0))
+      new(0,0)
   """
   @spec divf(t, t) :: t
   def divf(p = %Frac{}, q = %Frac{}) do
@@ -174,14 +286,48 @@ defmodule RationalCalculator.Fraction do
   end
 
   @doc """
-  A fraction can be reduced with a non-zero integer. The integer should divide into both numerator and denominator. Errors will result otherwise. By the way the new works, having the integer be negative will not alter anything. If the integer is 0, we get undef
+  A fraction can be reduced with a non-zero integer.
+
+  The integer should divide into both numerator and denominator. Incorrect results will happen.
+
+  By the way the new fraction creation works, having the integer be negative will
+  not alter anything.
+
+  If the integer is 0, we get undef
+
+  ## Examples
+
+      iex> reduce(new(24, 12), 2)
+      new(12, 6)
+
+      iex> reduce(new(24, 12), 0)
+      new(0,0)
+
+      Don't trust this if the factor is not common to both:
+
+      iex> reduce(new(12, 5), 2)
+      new(6, 2)
   """
   @spec reduce(t, integer) :: t
   def reduce(_, 0), do: %Frac{num: 0, den: 0}
-  def reduce(p = %Frac{}, fact), do: new(div(p.num, fact), div(p.den, fact))
+  def reduce(p = %Frac{}, factor), do: new(div(p.num, factor), div(p.den, factor))
 
   @doc """
-  Reduce a fraction if common factors
+  Reduce a fraction if it has common factors of numerator and denominator
+
+  ## Examples
+
+      iex> reduce(new(12, 15))
+      new(4, 5)
+
+      iex> reduce(new(4, 4))
+      new(1, 1)
+
+      iex> reduce(new(5, 0))
+      new(1, 0)
+
+      iex> reduce(new(0,0))
+      new(0,0)
   """
   @spec reduce(t) :: t
   def reduce(p = %Frac{}), do: reduce(p, Integer.gcd(p.num, p.den))
@@ -191,6 +337,84 @@ defmodule RationalCalculator.Fraction do
   """
   @spec scale(t, integer) :: t
   def scale(p = %Frac{}, scalar), do: new(p.num * scalar, p.den * scalar)
+
+  @doc """
+  Compares two fractions and returns :gt, :lt, :unk,  or :eq depending on if the first
+  one is greater than, less than, or equal to the second one.
+
+  ## Examples
+
+      iex> cmp(new(5, 3), new(7, 4))
+      :lt
+
+      iex> cmp(new(5, 3), new(10, 6))
+      :eq
+
+      iex> cmp(new(1, 3), new(-2, 3))
+      :gt
+
+      iex> cmp(new(3, 0), new(-2, 4))
+      :gt
+
+      iex> cmp(new(3, 0), new(-1, 0))
+      :gt
+
+      iex> cmp(new(3, 0), new(5, 0))
+      :unk
+
+      iex> cmp(new(0,0), new(4,7))
+      :unk
+
+  """
+  @spec cmp(t, t) :: atom
+  def cmp(p = %Frac{}, q = %Frac{})
+      when (p.num == 0 and p.den === 0) or (q.num == 0 and q.den == 0) do
+    :unk
+  end
+
+  # if they are of the same sign and both infinite, then comparison is unknown
+  # if one is negative and the other is positive infinity, then we know
+  def cmp(p = %Frac{}, q = %Frac{}) when p.den == 0 and q.den === 0 do
+    cond do
+      p.num * q.num > 0 -> :unk
+      p.num > 0 -> :gt
+      q.num > 0 -> :lt
+    end
+  end
+
+  def cmp(p = %Frac{}, q = %Frac{}) do
+    diff = p.num * q.den - q.num * p.den
+
+    cond do
+      diff > 0 -> :gt
+      diff < 0 -> :lt
+      diff == 0 -> :eq
+    end
+  end
+
+  @doc """
+  Returns true if the first fraction is greater than the second
+
+  Indeterminants return false.
+
+  ## Examples
+
+      iex> gt?(new(3, 4), new(1, 3))
+      true
+
+      iex> gt?(new(0,0), new(2,3))
+      false
+  """
+  @spec gt?(t, t) :: boolean
+  def gt?(p = %Frac{}, q = %Frac{}) do
+    res = cmp(p, q)
+
+    if res == :gt do
+      true
+    else
+      false
+    end
+  end
 
   @doc """
   Returns a tuple
