@@ -454,6 +454,56 @@ defmodule RationalCalculator.Fraction do
   end
 
   @doc """
+  Returns the maximum of two fractions.
+
+  If the comparison cannot be made, then 0/0 is returned
+
+  ## Examples
+
+      iex> maxf(new(5, 2), new(2, 4))
+      new(5, 2)
+
+      iex> maxf(new(4, 0), new(3, 0))
+      new(0,0)
+  """
+  @spec maxf(t, t) :: t
+  def maxf(p, q) do
+    res = cmp(p, q)
+
+    cond do
+      res == :gt -> p
+      res == :eq -> p
+      res == :lt -> q
+      true -> new(0, 0)
+    end
+  end
+
+  @doc """
+  Returns the minimum of two fractions.
+
+  If the comparison cannot be made, then 0/0 is returned
+
+  ## Examples
+
+      iex> minf(new(5, 2), new(2, 4))
+      new(2, 4)
+
+      iex> minf(new(4, 0), new(3, 0))
+      new(0,0)
+  """
+  @spec minf(t, t) :: t
+  def minf(p, q) do
+    res = cmp(p, q)
+
+    cond do
+      res == :lt -> p
+      res == :eq -> p
+      res == :gt -> q
+      true -> new(0, 0)
+    end
+  end
+
+  @doc """
   Returns true if the first fraction is greater than or equal to the second
 
   Indeterminants return false.
@@ -657,8 +707,8 @@ defmodule RationalCalculator.Fraction do
 
    ## Examples
 
-    iex> pow(new(10,6), 7 )
-    new(5**7, 3**7)
+      iex>
+      pow(new(10,6), 7 ) new(5**7, 3**7)
 
   """
   @spec pow(t, integer) :: t
@@ -669,7 +719,7 @@ defmodule RationalCalculator.Fraction do
 
   def pow(p, exp) do
     p = reduce(p)
-    new(p.num ** exp, p.den ** exp)
+    new(Integer.pow(p.num, exp), Integer.pow(p.den, exp))
   end
 
   @doc """
